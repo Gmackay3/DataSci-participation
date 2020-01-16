@@ -16,3 +16,6 @@ This will take me to the overall homepage for the class in GitHub, where the hom
 
 Class GitHub homepage overall: https://github.com/USF-Psych-DataSci
 This should take me to the overall homepage for the class.
+
+Adding text for app to website practice
+Adding another text for app to website practice
