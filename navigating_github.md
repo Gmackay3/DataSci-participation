@@ -11,5 +11,8 @@ This will take me to the homework repository where I can submit, edit and view m
 Class website: https://wiernik-datasci.netlify.com/
 This will take me to the main Data Science and Visualization page
 
-Class GitHub homepage: https://github.com/USF-Psych-DataSci-2020
+Class GitHub homepage for 2020: https://github.com/USF-Psych-DataSci-2020
 This will take me to the overall homepage for the class in GitHub, where the homeworks, annoucements and discussions pages are all available to me. 
+
+Class GitHub homepage overall: https://github.com/USF-Psych-DataSci
+This should take me to the overall homepage for the class.
