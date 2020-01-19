@@ -79,17 +79,56 @@ tail(mtcars) #gives last 6 rows
 str(mtcars)  #gives the structure of the data- tells it is a dataframe, with 32 rows with 11 variables in each
 names(mtcars) #tells the column names of the dataframe, the " " tell us it is a string (character vector/word)
 
+#added 1/19/2020 Finishing section 2.5.8 "Introduction to R"
+# this finishes the above portion which is quetsion 1 in 2.5.8 of the outline "Orientation to R"
+head(mtcars) #gives first 6 rows
+tail(mtcars) #gives last 6 rows
+str(mtcars)  #gives the structure of the data- tells it is a dataframe, with 32 rows with 11 variables in each
+nrow(mtcars) #gives the number of rows in the dataframe
+ncol(mtcars) #gives the number of columns in the dataframe
+summary(mtcars) #gives summary statistics about the dataframe. It does it for each of the columns.
+row.names(mtcars) # this gives all of the row names in the dataframe
+names(mtcars) #tells the column names of the dataframe, the " " tell us it is a string (character vector/word)
+# 2 --> answer is "mpg"
+names(mtcars[1]) #this will print out the name of the first column only
+# 3 --> 6th column
+names(mtcars) #I printed them all to see all of the column names and counted them until "wt"
+names(mtcars[6]) #after counting them, "wt" was 6th but this line calls only that column to double check that
+#calling the ?mtcars would also bring up the info page, containing a section that labeled all of the columns and what numbers call each.
+# 4 --> 20.09062
+mtcars$mpg #this calls only the mpg column values
+mean(mtcars$mpg) #this finds the mean of the values in the mpg column only
 
+#moving into Section 2.5.9 
+#packages are generally installed and loaded at the beginning of a script, I left these here for now because of the order in which the notes have R activities
+install.packages("tibble") #installing them to R
+install.packages("gapminder") #installing to R
+library("tibble") #loading them for use
+library("gapminder") #loading for use
 
+#mtcars is in the R dataset archive(?) as it is a preloaded dataframe that is already preloaded into R.
 
+?tibble
+browseVignettes(package = "tibble") #this opened a new tab in Chrome when I entered it.
+print(gapminder)
+#the tibble is different from a dataframe because it gives additional information underneath the column names ( <fct>, <int>, <dbl>), it also gives the dimensions of the dataframe right at the beginning by giving the rows x columns in terms of numbers
+head(gapminder) 
+tail(gapminder) 
+str(gapminder)  
+nrow(gapminder) 
+ncol(gapminder) 
+summary(gapminder) 
+row.names(gapminder) 
+names(gapminder)
 
+#Section 2.5.10
+?'{'
+# The '(' function is used to identify an item or argument. The '{' function is used to for evaluating expressions (I am not sure I am understanding the help funciton well enough or not.)
 
-
-
-
-
-
-
-
-
-
+# Section 2.7.1
+install.packages("tinytex")
+library("tinytex")
+tinytex::install_tinytex()
+# Checking after restart if this returns TRUE
+tinytex:::is_tinytex()
+#it did! Yay.
