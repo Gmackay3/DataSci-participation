@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Helpful Links
 
 My participation repository: [participation repository](https://github.com/Gmackay3/DataSci-participation/)
