@@ -1,0 +1,92 @@
+---
+title: "In Class"
+author: "Grace MacKay"
+date: "1/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preliminary (from "s03a_ggplot_p1-exercise" file)
+
+Begin by loading the required packages. If you don't have these installed (or don't know whether you have them installed), you can install them by executing the following code in your console:
+
+```
+install.packages("tidyverse")
+install.packages("scales")
+install.packages("tsibble")
+```
+
+Now run this code chunk to load the packages:
+
+```{r load packages, warning = FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(tsibble))
+knitr::opts_chunk$set(fig.align = "center")
+```
+
+
+## Following In-Class
+
+Point plot
+```{r running gapminder plots, echo=FALSE}
+ggplot(gapminder, aes(gdpPercap, lifeExp)) +
+  geom_point(alpha = 0.1) +
+  scale_x_log10("GDP per capita", labels = scales::dollar_format()) +
+  theme_bw() +
+  ylab("Life Expectancy")
+```
+
+## Building the inclass example with gapminder
+
+```{r, echo=FALSE}
+ggplot(gapminder, aes(gdpPercap, lifeExp)) +
+  geom_point(alpha = 0.1) + #if we don't have alpha = 0.1 then it will just have a bunch of overlapping points that we can't tell apart. the alpha is transparency and the 0.1 means we need 10 points to get a totally solid color
+  scale_x_log10("GDP per capita", labels = scales::dollar_format()) + #scales is a package and the :: means look for within the package
+  theme_bw() + #changes the theme
+  ylab("Life Expectancy") 
+
+```
+
+```{r}
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram(bins = 50)
+```
+
+
+```{r}
+ggplot(gapminder, aes(lifeExp)) +
+  geom_density()
+```
+
+```{r}
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_jitter()
+```
+
+```{r}
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.1)
+
+```
+
+```{r}
+ggplot(gapminder, aes(continent, lifeExp)) +
+  ggridges::grom_density_ridges()
+```
+
+
+
+
+
+
