@@ -82,7 +82,7 @@ ggplot(gapminder, aes(continent, lifeExp)) +
 
 ```{r}
 ggplot(gapminder, aes(continent, lifeExp)) +
-  ggridges::grom_density_ridges()
+  ggridges::geom_density_ridges()
 ```
 
 

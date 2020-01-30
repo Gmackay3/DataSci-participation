@@ -124,7 +124,7 @@ tribble(
   ggplot(aes(x, y)) + 
   geom_line() + 
   geom_path(arrow = arrow()) +
-  geom_text(aes(label = "Time"))
+  geom_text(aes(label = c("Time 1", "Time 2", "Time 3", "Time 4")))
 ```
 
 ## Exercise 5: Life expectancies in Africa
@@ -134,14 +134,16 @@ tribble(
 Fix the plot so that you can actually see the data points. 
 
 There is also the problem of overlapping text in the x-axis labels. How could we solve that?
+Code to fix the x-axis labels from [here](https://stackoverflow.com/questions/1828742/rotating-axis-labels-in-r)
 
 ```{r, fig.width = 5, fig.height = 2}
 gapminder %>% 
   filter(continent == "Americas") %>% 
   ggplot(aes(country, lifeExp)) + 
-  geom_point() +
+  geom_point(alpha = 0.2) +
   geom_boxplot() +
-  scale_x_discrete()
+  scale_x_discrete(labels = abbreviate) +
+  theme(axis.text.x = element_text(angle=45, hjust=1)) #from stackoverflow
 ```
 
 ### 5(b) Ridgeplots
@@ -151,9 +153,8 @@ We're starting with the same plot as above, but instead of the points + boxplot,
 ```{r, fig.width = 5, fig.height = 2}
 gapminder %>% 
   filter(continent == "Americas") %>% 
-  ggplot(aes(country, lifeExp)) + 
-  geom_point() +
-  geom_boxplot()
+  ggplot(aes(lifeExp, country)) + 
+  ggridges::geom_density_ridges(aes(scale = 2))
 ```
 
 ## Exercise 6: Bar plot madness
