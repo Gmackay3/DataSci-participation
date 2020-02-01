@@ -168,11 +168,16 @@ gapminder %>%
 - Put the bars for transmission side-by-side with their own colour.
 - Capitalize the legend title.
 
+Notes: I was able to get the proportions on the y and the variables discrete but they removed all of the x-labels and I cannot get them to return
+
 ```{r, fig.width = 5, fig.height = 2}
 mtcars %>% 
-  mutate(transmission = if_else(am == 0, "automatic", "manual")) %>% 
+  mutate(transmission = if_else(am == 0, "automatic", "manual")) %>%
   ggplot(aes(cyl)) +
-  geom_bar(aes(color = transmission))
+  geom_bar(aes(color = transmission, y = ..prop.., fill = transmission)) +
+  scale_x_discrete(aes("cyl", breaks = waiver(), labels = scales::label_number(c("4", "6", "8")), limits = )) 
+  #xlab(c("4", "6", "8"))
+
 ```
 
 ### 6(b) Bar heights already calculated
