@@ -168,13 +168,14 @@ gapminder %>%
 - Put the bars for transmission side-by-side with their own colour.
 - Capitalize the legend title.
 
-Notes: I was able to get the proportions on the y and the variables discrete but they removed all of the x-labels and I cannot get them to return
+Notes: I was able to get the proportions on the y and the variables discrete but they removed all of the x-labels and I cannot get them to return. Not Sure how to get the Transmission capitalized at this time.
 
 ```{r, fig.width = 5, fig.height = 2}
 mtcars %>% 
   mutate(transmission = if_else(am == 0, "automatic", "manual")) %>%
   ggplot(aes(cyl)) +
-  geom_bar(aes(color = transmission, y = ..prop.., fill = transmission)) +
+  geom_bar(position = "dodge", aes(color = transmission, y = ..prop.., fill = transmission)) +
+  # labs(ledgend = "Transmission")
   scale_x_discrete(aes("cyl", breaks = waiver(), labels = scales::label_number(c("4", "6", "8")), limits = )) 
   #xlab(c("4", "6", "8"))
 
@@ -193,7 +194,8 @@ Fix the following bar plot so that it shows these counts.
 
 ```{r}
 ggplot(hair, aes(Hair, n)) +
-  geom_bar()
+  geom_col() +
+  ylab("Count")
 ```
 
 ## Exercise 7: Tiling
@@ -210,7 +212,8 @@ _Hint:_ What's the title of this exercise?
 
 ```{r}
 ggplot(hair_eye, aes(Hair, Eye)) +
-  geom_point(aes(colour = n))
+  geom_point(aes(colour = n)) +
+  geom_tile(aes(fill = n))
 ```
 
 By the way, `geom_count()` is like `geom_bar()`: it counts the number of overlapping points.
@@ -221,13 +224,77 @@ By the way, `geom_count()` is like `geom_bar()`: it counts the number of overlap
 If you'd like some practice, give these exercises a try
 
 __Exercise 1__: Make a plot of `year` (x) vs `lifeExp` (y), with points coloured by continent. Then, to that same plot, fit a straight regression line to each continent, without the error bars. If you can, try piping the data frame into the `ggplot()` function.
+Help for regression line found [here](https://stackoverflow.com/questions/15633714/adding-a-regression-line-on-a-ggplot)
+
+```{r}
+ggplot(gapminder, aes(year, lifeExp)) + 
+  geom_point(alpha = 0.2, aes(color = continent)) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE)
+```
+
 
 __Exercise 2__: Repeat Exercise 1, but switch the _regression line_ and _geom\_point_ layers. How is this plot different from that of Exercise 1?
 
+Initially the graph looks the same but looking closer shows that since the coding order was reversed, the line is actually behind the points in this graph whereas in the first graph, the line appeared overtop of the points. The standard error can be added to the line by changing the se = FALSE to se = TRUE.
+
+```{r}
+ggplot(gapminder, aes(year, lifeExp)) + 
+ geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  geom_point(alpha = 0.2, aes(color = continent)) 
+
+```
+
 __Exercise 3__: Omit the `geom_point()` layer from either of the above two plots (it doesn't matter which). Does the line still show up, even though the data aren't shown? Why or why not?
+
+Removing the points from the graph did not remove the line from the graph because they are using two separate functions. The geom_point() function creates a graph that uses only points to represent the data. The geom_smooth() function creates a line for the data, in this case a regression line but it can also be log or a unique formula if specified. Removing the grom_point() function just removed one of the layers of the graph.
+
+```{r}
+ggplot(gapminder, aes(year, lifeExp)) + 
+  #geom_point(alpha = 0.2, aes(color = continent)) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE)
+```
 
 __Exercise 4__: Make a plot of `year` (x) vs `lifeExp` (y), facetted by continent. Then, fit a smoother through the data for each continent, without the error bars. Choose a span that you feel is appropriate.
 
+```{r, fig.width = 5, fig.height = 2}
+ggplot(gapminder, aes(year, lifeExp)) +
+    geom_point(alpha = 0.2, aes(color = continent)) +
+  scale_x_log10(labels = scales::comma_format())+
+  facet_wrap(vars(continent)) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  theme(axis.text.x = element_text(angle=45, hjust=1)) #from stackoverflow (see exercise 5a)
+```
+
 __Exercise 5__: Plot the population over time (year) using lines, so that each country has its own line. Colour by `gdpPercap`. Add alpha transparency to your liking. 
 
+```{r, fig.width = 5, fig.height = 2}
+  ggplot(gapminder, aes(year, pop)) +
+  geom_line(aes(alpha = .5, group = country, color = gdpPercap)) +
+  scale_y_continuous(labels = scales::comma_format())
+```
+Another version using the log 10 for the y axis to be able to see the lines better:
+
+```{r, fig.width = 5, fig.height = 2}
+  ggplot(gapminder, aes(year, pop)) +
+  geom_line(aes(alpha = .5, group = country, color = gdpPercap)) +
+  scale_y_log10(labels = scales::comma_format())
+```
+
+
 __Exercise 6__: Add points to the plot in Exercise 5.
+
+First version of 5
+```{r, fig.width = 5, fig.height = 2}
+  ggplot(gapminder, aes(year, pop)) +
+  geom_line(aes(alpha = .5, group = country, color = gdpPercap)) +
+  scale_y_continuous(labels = scales::comma_format()) +
+  geom_point()
+```
+
+Second version of 5
+```{r, fig.width = 5, fig.height = 2}
+  ggplot(gapminder, aes(year, pop)) +
+  geom_line(aes(alpha = .5, group = country, color = gdpPercap)) +
+  scale_y_log10(labels = scales::comma_format()) +
+  geom_point()
+```
