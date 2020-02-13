@@ -29,6 +29,7 @@ Load the `tidyverse` package.
 ```{r load packages, warning = FALSE, message = FALSE}
 # load your packages here:
 library(tidyverse)
+library(gapminder)
 ```
     
 
@@ -142,6 +143,32 @@ IrisConvert %>%
 
 Let's head back to the guide at the section on `summarize()`.
 
+```{r follwed in class}
+gapminder %>% 
+  summarize(mu = mean(lifeExp),
+            sigma = sd(lifeExp))
+
+iris %>% 
+  summarize_if(is.numeric, funs(mean = mean, sd = sd)) #does them all at one time
+
+gapminder %>% 
+  group_by(continent, year) %>% 
+  summarize(mu = mean(lifeExp),
+            sigma = sd(lifeExp))
+
+gapminder %>% 
+  group_by(continent) %>% 
+  summarize(n_countries = n_distinct(country)) 
+  #summarize(n_countries = length(unique(count))) #This is another way to do the same things as above.
+
+gap_inc <- gapminder %>% 
+  arrange(year) %>% 
+  group_by(country) %>%
+  mutate(gdpPercap_inc = round(gdpPercap - lag(gdpPercap), 3)) %>% 
+  arrange(country)
+print(gap_inc)
+```
+
 
 # Exercises for grouped data frames
 
@@ -153,8 +180,10 @@ Let's do some practice with grouping (and ungrouping) and summarizing data frame
 
 ```{r}
 gapminder %>% 
-  group_by(FILL_THIS_IN) %>% 
-  FILL_THIS_IN(min_life = min(lifeExp))
+  group_by(continent, year) %>% 
+  summarize(min_life = min(lifeExp)) %>% 
+  # add corresponding country to tibble %>% 
+  arrange(min_life)
 ```
 
 
@@ -162,11 +191,12 @@ gapminder %>%
 in the `psych::bfi` dataset. Be sure to handle `NA`!
 
 ```{r}
-psych::bfi %>%
+psych::bfi %>% rownames_to_column("ID") %>% 
   as_tibble() %>% 
-  select(A1:A5) %>% 
-  rowwise() %>% 
-  mutate(A_mean = mean(c(A1, A2, A3, A4, A5), na.rm = TRUE)) %>% 
+  select(ID, A1:A5) %>% 
+  rowwise() %>% #groups by each ros as it's own group so all computations are done separately by row Without this is will cause the rows to all have the same mean value because it is averaging all of the data points
+  mutate(A_mean = mean(c(A1, A2, A3, A4, A5), na.rm = TRUE),
+         A_sd = sd(c(A1, A2, A3, A4, A5), na.rm = TRUE)) %>% 
   ungroup()
 ```
 
@@ -174,7 +204,14 @@ Now compute mean scores for Conscientiousness, as well as `sd` and `min` scores
 for reach person.
 
 ```{r}
-
+psych::bfi %>% rownames_to_column("ID") %>% 
+  as_tibble() %>% 
+  select(ID, C1:C5) %>% 
+  rowwise() %>% #groups by each ros as it's own group so all computations are done separately by row Without this is will cause the rows to all have the same mean value because it is averaging all of the data points
+  mutate(C_mean = mean(c(C1, C2, C3, C4, C5), na.rm = TRUE),
+         C_sd = sd(c(C1, C2, C3, C4, C5), na.rm = TRUE),
+         C_min = min(c(C1, C2, C3, C4, C5), na.rm = TRUE)) %>% 
+  ungroup()
 ```
 
 Some functions are **vectorized**, so you don't need `rowwise()`. 
@@ -222,9 +259,18 @@ psych::bfi %>%
    participant. Store this data frame as a new object.
    
 ```{r}
-FILL_THIS_IN <-
+bfiEDU <-
   psych::bfi %>% 
-  FILL_THIS_IN(FILL_THIS_IN)
+  mutate(education = as.factor(education)) %>% 
+  mutate(education = fct_explicit_na(education)) %>% 
+  select(A1:O5, education) %>% 
+  mutate(A_mn = rowMeans(select(., A1:A5), na.rm = TRUE),
+         C_mn = rowMeans(select(., C1:C5), na.rm = TRUE),
+         E_mn = rowMeans(select(., E1:E5), na.rm = TRUE),
+         N_mn = rowMeans(select(., N1:N5), na.rm = TRUE),
+         O_mn = rowMeans(select(., O1:O5), na.rm = TRUE)) %>% 
+  select(education, A_mn:O_mn)
+bfiEDU
 ```
 
 4. Use the data from Task 3 to summarize the distributions of Big Five scores 
@@ -232,9 +278,32 @@ FILL_THIS_IN <-
    each score in each group). Also report the sample size within each group.
    
 ```{r}
-FILL_THIS_IN %>% 
-  FILL_THIS_IN(FILL_THIS_IN) %>% 
-  FILL_THIS_IN(FILL_THIS_IN)
+bfiEDU %>% 
+  group_by(education) %>% 
+  rowwise() %>% 
+  summarize(education = n(),
+            Amean = mean(A_mn),
+            Asd = sd(A_mn, na.rm = TRUE),
+            Amin = min(A_mn),
+            Amax = max(A_mn),
+            Cmean = mean(C_mn),
+            Csd = sd(C_mn, na.rm = TRUE),
+            Cmin = min(C_mn),
+            Cmax = max(C_mn),
+            Emean = mean(E_mn),
+            Esd = sd(E_mn, na.rm = TRUE),
+            Emin = min(E_mn),
+            Emax = max(E_mn),
+            Nmean = mean(N_mn),
+            Nsd = sd(N_mn, na.rm = TRUE),
+            Nmin = min(N_mn),
+            Nmax = max(N_mn),
+            Omean = mean(O_mn),
+            Osd = sd(O_mn, na.rm = TRUE),
+            Omin = min(O_mn),
+            Omax = max(O_mn)) %>% 
+  ungroup() #%>% 
+ # arrange(education)
 ```  
 
 
