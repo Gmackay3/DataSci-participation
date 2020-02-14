@@ -278,32 +278,30 @@ bfiEDU
    each score in each group). Also report the sample size within each group.
    
 ```{r}
+
 bfiEDU %>% 
   group_by(education) %>% 
-  rowwise() %>% 
-  summarize(education = n(),
-            Amean = mean(A_mn),
-            Asd = sd(A_mn, na.rm = TRUE),
-            Amin = min(A_mn),
-            Amax = max(A_mn),
-            Cmean = mean(C_mn),
-            Csd = sd(C_mn, na.rm = TRUE),
-            Cmin = min(C_mn),
-            Cmax = max(C_mn),
-            Emean = mean(E_mn),
-            Esd = sd(E_mn, na.rm = TRUE),
-            Emin = min(E_mn),
-            Emax = max(E_mn),
-            Nmean = mean(N_mn),
-            Nsd = sd(N_mn, na.rm = TRUE),
-            Nmin = min(N_mn),
-            Nmax = max(N_mn),
-            Omean = mean(O_mn),
-            Osd = sd(O_mn, na.rm = TRUE),
-            Omin = min(O_mn),
-            Omax = max(O_mn)) %>% 
-  ungroup() #%>% 
- # arrange(education)
+  summarize(#n_education = n_distinct(education),
+            mean_A = mean(A_mn),
+            sd_A = sd(A_mn),
+            min_A = min(A_mn),
+            max_A = max(A_mn),
+            mean_C = mean(C_mn),
+            sd_C = sd(C_mn),
+            min_C = min(C_mn),
+            max_C = max(C_mn),
+            mean_E = mean(E_mn),
+            sd_E = sd(E_mn),
+            min_E = min(E_mn),
+            max_E = max(E_mn),
+            mean_N = mean(N_mn),
+            sd_N = sd(N_mn),
+            min_N = min(N_mn),
+            max_N = max(N_mn),
+            mean_O = mean(O_mn),
+            sd_O = sd(O_mn),
+            min_O = min(O_mn),
+            max_O = max(O_mn))
 ```  
 
 
