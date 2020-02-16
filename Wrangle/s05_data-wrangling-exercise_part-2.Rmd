@@ -281,7 +281,7 @@ bfiEDU
 
 bfiEDU %>% 
   group_by(education) %>% 
-  summarize(#n_education = n_distinct(education),
+  summarize(#n_education = n_distinct(length(unique(count))),
             mean_A = mean(A_mn),
             sd_A = sd(A_mn),
             min_A = min(A_mn),
