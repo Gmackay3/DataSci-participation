@@ -262,7 +262,7 @@ psych::bfi %>%
 bfiEDU <-
   psych::bfi %>% 
   mutate(education = as.factor(education)) %>% 
-  mutate(education = fct_explicit_na(education)) %>% 
+  mutate(education = fct_explicit_na(education)) %>% # use of code from: https://forcats.tidyverse.org/reference/fct_explicit_na.html
   select(A1:O5, education) %>% 
   mutate(A_mn = rowMeans(select(., A1:A5), na.rm = TRUE),
          C_mn = rowMeans(select(., C1:C5), na.rm = TRUE),
@@ -281,7 +281,7 @@ bfiEDU
 
 bfiEDU %>% 
   group_by(education) %>% 
-  summarize(#n_education = n_distinct(length(unique(count))),
+  summarize(n_education = n(), #help from https://dplyr.tidyverse.org/reference/n.html to get the number of observations per group
             mean_A = mean(A_mn),
             sd_A = sd(A_mn),
             min_A = min(A_mn),
