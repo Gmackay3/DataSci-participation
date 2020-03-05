@@ -12,10 +12,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #install.packages("here")
 #install.packages("ggplot2", dependencies = TRUE)
+#install.packages("export")
 library(tidyverse)
 library(gapminder)
 library(here)
 library(readxl)
+#library(export)
 ```
 
 ```{r from computer}
@@ -99,7 +101,7 @@ ggsave(here::here("output", "figures", "clevel_extraversion.svg"), clevel_plot)
 ```
 
 ```{r saving other versions}
-ggsave(here::here("output", "figures", "clevel_extraversion.eps"), clevel_plot) ## given an error: Error in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)) : family 'sans' not included in postscript() device
+ggsave(here::here("output", "figures", "clevel_extraversion.eps"), clevel_plot, fonts = c("sans")) ## given an error: Error in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)) : family 'sans' not included in postscript() device
 ggsave(here::here("output", "figures", "clevel_extraversion.pdf"), clevel_plot)
 ggsave(here::here("output", "figures", "clevel_extraversion.tiff"), clevel_plot)
 ggsave(here::here("output", "figures", "clevel_extraversion.png"), clevel_plot)
