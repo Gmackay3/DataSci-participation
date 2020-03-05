@@ -1,0 +1,37 @@
+---
+title: "3/5/2020 Participation"
+author: "Grace MacKay"
+date: "3/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(gapminder)
+library(tidyverse)
+```
+
+```{r making new dataset}
+(gap_asia_2007 <- gapminder %>% filter(year == 2007, continent == "Asia"))
+
+write_csv(gap_asia_2007, "exported_file.csv") #writing the new dataset as a csv file on the comupter. The file will be called whatever is in the " " 
+```
+
+```{r}
+file.path("data", "cats_data.csv")
+here::here()
+```
+
+
+
+
+
+
+
+
+
+
+
