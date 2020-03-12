@@ -1,0 +1,379 @@
+---
+title: "s09 Exercises: Factors"
+output: 
+  html_document:
+    keep_md: true
+    theme: paper
+---
+
+```{r allow errors, echo = FALSE}
+knitr::opts_chunk$set(error = TRUE)
+library(tidyverse)
+library(gapminder)
+library(patchwork)
+library(gridExtra)
+
+
+```
+
+## Motivating the need for factors in R
+
+### Activity 1: Using factors for plotting 
+
+**1.1** Let's look again into `gapminder` dataset and create a new cloumn, 
+`life_level`, that contains five categories ("very high", "high","moderate", 
+"low", "very low") based on life expectancy in 1997. Assign categories accoring 
+to the table below:
+
+| Criteria | life_level| 
+|-------------|-----------|
+| less than 23 | very low |
+| between 23 and 48 | low |
+| between 48 and 59 | moderate |
+| between 59 and 70 | high |
+| more than 70 | very high |
+
+Function `case_when()` is a tidier way to vectorise multiple `if_else()` statements. 
+You can read more about this function [here](https://dplyr.tidyverse.org/reference/case_when.html).
+
+The ~ is separating the condition from the result. The item before it is the level we are setting and the item after it is what we are labeling the values that meet that criteria. We don't need to explicity tell it to have values between 23 and 48 because what it is doing is going case by case to decide if it is true but it is indicates if a value is less than 23 it was true for the first one so it doesn't check when it comes to labeling it as less than 48. It has already been labeled so it doesn't relabel it. 
+
+This is popular to use for breaking up a variable.
+The cases that you are listing are going to be in True/False format- you can do any logical explanation as long as it returns a single value that can be called True or False.
+If it goes through all the values and there is a value that doesn't match anything, it will come back as an NA or missing value for those rows. The True at the end is supposed to catch all of those if used.
+```{r}
+gapminder %>% 
+  filter(year == 1997) %>% 
+  mutate(life_level = case_when(lifeExp < 23 ~ 'very low',
+                                lifeExp < 48 ~ 'low',
+                                lifeExp < 59 ~ 'moderate',
+                                lifeExp < 70 ~ 'high',
+                                # else
+                                TRUE ~ 'very high')) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = life_level, y = gdpPercap)) +
+  labs(y = "GDP per capita, $", x = "Life expectancy level, years") +
+  theme_bw() 
+```
+
+Do you notice anything odd/wrong about the graph?
+Very low is missing and the order is incorrect. It has labeled everything alphabetically rather than in a meaningful order. If we use a factor we can fix this problem.
+
+We can make a few observations:
+
+- It seems that none of the countries had a "very low" life-expectancy in 1997. 
+
+- However, since it was an option in our analysis it should be included in our plot. Right?
+
+- Notice also how levels on x-axis are placed in the "wrong" order.
+
+**1.2** You can correct these issues by explicitly setting the levels parameter 
+in the call to `factor()`. Use, `drop = FALSE` to tell the plot not to drop 
+unused levels.
+
+```{r}
+gapminder %>% 
+  filter(year == 1997) %>% 
+  mutate(life_level = factor(
+    case_when(lifeExp < 23 ~ 'very low',
+                                lifeExp < 48 ~ 'low',
+                                lifeExp < 59 ~ 'moderate',
+                                lifeExp < 70 ~ 'high',
+                                # else
+                                TRUE ~ 'very high') ,
+                      levels = c("very low", "low", "moderate", "high", "very high"))) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = life_level, y = gdpPercap)) +
+  labs(y = "GDP per capita, $", x = "Life expectancy level, years") +
+  theme_bw() +
+  scale_x_discrete(drop = FALSE) #this line is needed so that it does not drop the very low column- it tells it not to drop any empty categories
+```
+
+## Activity 2: Inspecting factors
+
+In Activity 1, we created our own factors, so now let's explore what 
+categorical variables that we have in the `gapminder` dataset.
+
+### **2.1** Exploring `gapminder$continent`
+
+Use functions such as `str()`, `levels()`, `nlevels()` and `class()` to 
+answer the following questions:
+
+- What class (type of object) is `continent` (a factor or character)? 
+    Factor
+- How many levels? What are they? 
+    5 levels: "Africa"   "Americas" "Asia"     "Europe"   "Oceania"
+- What integer is used to represent factor "Asia"?
+    3
+
+the level is a property of the variable. even if there are no cases selected for a level, the level still exists.
+```{r}
+str(gapminder$continent)
+levels(gapminder$continent)
+nlevels(gapminder$continent)
+class(gapminder$continent)
+
+filter(gapminder, continent == "Asia") %>% pull(continent) %>% as.numeric()
+filter(gapminder, continent == "Asia") %>% pull(continent)
+```
+
+### **2.2** Exploring `gapminder$country`
+
+Let's explore what else we can do with factors. Answer the following questions: 
+
+- How many levels are there in `country`?
+- Filter `gapminder` dataset by 5 countries of your choice. How many levels are 
+  in your filtered dataset?
+
+```{r}
+levels(gapminder$country)
+h_country <- c("Ireland", "Kenya", "Japan", "Brazil", "France")
+h_gap <- gapminder %>% 
+  filter(country %in% h_country)
+nlevels(h_gap$country)
+
+```
+
+## Dropping unused levels
+
+What if we want to get rid of some levels that are "unused" -- how do we do that? 
+
+The function `droplevels()` operates on all the factors in a data frame or on a 
+single factor. The function `forcats::fct_drop()` operates on a factor and does 
+not drop `NA` values.
+
+```{r}
+h_gap_dropped <- h_gap %>% 
+  droplevels()
+
+h_gap_dropped$country %>%
+  nlevels()
+
+```
+
+## Changing the order of levels
+
+Let's say we wanted to re-order the levels of a factor using a new metric - say, count().
+
+We should first produce a frequency table as a tibble using `dplyr::count()`:
+
+```{r}
+gapminder %>% 
+  count(continent)
+
+
+
+```
+
+The table is nice, but it would be better to visualize the data.
+Factors are most useful/helpful when plotting data.
+So let's first plot this:
+
+```{r}
+gapminder %>%
+  ggplot() +
+  geom_bar(aes(continent)) +
+  coord_flip() + #flips the axes
+  theme_bw() +
+  ylab("Number of entries") + xlab("Continent")
+```
+
+Think about how levels are normally ordered. 
+It turns out that by default, R always sorts levels in alphabetical order. 
+However, it is often preferable to order the levels according to some principle:
+
+  1. Frequency/count (`fct_infreq()`)-> used for a function working with a factor- reorders based on frequency
+  2. Order of appearance (`fct_inorder()`) -> in order of how they are
+  3. Sequence of the underlying integers (`fct_inseq()`) 
+  
+- Make the most common level the first and so on. Function like `fct_infreq()` 
+  might be useful.
+- The function `fct_rev()` will sort them in the opposite order.
+
+```{r}
+gapminder %>%
+  ggplot() +
+  geom_bar(aes(fct_infreq(continent))) +
+  coord_flip() +
+  theme_bw() +
+  ylab("Number of entries") + xlab("Continent")
+```
+
+Section 9.6 of Jenny Bryan's [notes](https://stat545.com/factors-boss.html#reorder-factors) has some helpful examples.
+
+  4. Another variable. 
+  
+  - For example, if we wanted to bring back our example of ordering `gapminder` 
+    countries by life expectancy, we can visualize the results using `fct_reorder()`. 
+
+```{r}
+##  default summarizing function is median()
+gapminder %>%
+  ggplot() +
+  geom_bar(aes(fct_reorder(continent, lifeExp, max))) + #take max expectancy of each continent and order in the lowest life Exp to the highest lifeExp
+  coord_flip() +
+  theme_bw() +
+  xlab("Continent") + ylab("Number of entries") 
+
+## ggplot builds up from the y axis up so the first value is the one on the bottom
+```
+
+Use `fct_reorder2()` when you have a line chart of a quantitative x against 
+another quantitative y and your factor provides the color. 
+
+```{r}
+## order by life expectancy 
+ggplot(h_gap, aes(x = year, y = lifeExp,
+                  color = fct_reorder2(country, year, lifeExp))) +
+  geom_line() +
+  labs(color = "Country")
+```
+
+## Change order of the levels manually
+
+This might be useful if you are preparing a report for say, the state of affairs 
+in Africa.
+
+```{r}
+gapminder %>%
+  ggplot() +
+  geom_bar(aes(fct_relevel(continent, "Oceania"))) + #will label Oceania first then everything else
+  coord_flip()+
+  theme_bw() 
+## THIS DID NOT WORK FOR ME-- It gave an error about "unknown levels in 'f": oceania 
+## EDIT: THIS HAPPENED BECAUSE THE O WAS NOT CAPITAL IN THE FIRST TIME I TYPED IT
+```
+
+More details on reordering factor levels by hand can be found 
+[here](https://forcats.tidyverse.org/reference/fct_relevel.html).
+
+## Recoding factors
+
+Sometimes you want to specify what the levels of a factor should be.
+For instance, if you had levels called "blk" and "brwn", you would rather they 
+be called "Black" and "Brown" -- this is called recoding.
+
+Lets recode `Oceania` and the `Americas` in the graph above as abbreviations 
+`OCN` and `AME` respectively using the function `fct_recode()`.
+
+```{r}
+gapminder %>%
+  ggplot() +
+  geom_bar(aes(fct_recode(continent, "OCN" = "Oceania", "AME" = "Americas"))) +
+  coord_flip() +
+  theme_bw()
+
+#factor you want to recode, the new label, the old label
+```
+
+## Grow a factor (OPTIONAL)
+
+Let’s create two data frames,`df1` and `df2` each with data from two countries, 
+dropping unused factor levels.
+
+```{r}
+df1 <- gapminder %>%
+  filter(country %in% c("United States", "Mexico"), year > 2000) %>%
+  droplevels()
+df2 <- gapminder %>%
+  filter(country %in% c("France", "Germany"), year > 2000) %>%
+  droplevels()
+df1
+df2
+```
+
+The country factors in `df1` and `df2` have different levels.
+Can you just combine them using `c()`?
+Factors are a vector of numbers with a look-up table telling what the numbers are.
+```{r}
+c(df1$country, df2$country)
+```
+
+Use `fct_c()` to perform `c()`, but also combine the levels of the two factor
+variables:
+it first revels them so it has the same number of levels (Mex and US in first level and Fr Ger are in the second level) then it looks at them. So it has 4 different numbers now and would look like 11223344
+```{r}
+fct_c(df1$country, df2$country)
+```
+
+Explore how different forms of row binding work behave here, in terms of the 
+country variable in the result. 
+
+```{r}
+bind_rows(df1, df2) #will convert everything to characters and then doing things based on the labels
+rbind(df1, df2)
+```
+
+
+
+## Lesson 11 codes from Guide
+
+```{r}
+library("tidyverse")
+
+ggplot(airquality, aes(`Month`, `Temp`, group = `Month`)) +
+    geom_boxplot(outlier.shape = NA) +
+    geom_jitter(alpha = 0.3) +
+    labs(x = "",
+         y = "",
+         title="Maximum temperature by month") +
+    theme_bw() + 
+    scale_x_continuous(breaks = c(5, 6, 7, 8, 9), 
+                       labels = c("May", "June", "July", "August", "September")) +
+    annotate("text", x = 4.08, y = 95, label="°F", size = 8) +
+    coord_cartesian(xlim = c(4.5, 9.5),
+                    clip = 'off') +
+    theme(panel.grid.minor = element_blank(),
+          panel.background = element_blank(), 
+          axis.line = element_line(colour = "gray"),
+          panel.border = element_blank(),
+          text = element_text(size=18)
+          )
+```
+
+
+```{r breaking the graph}
+library("tidyverse")
+
+ggplot(airquality, aes(`Month`, `Temp`, group = `Month`)) +
+    geom_boxplot(outlier.shape = "triangle", outlier.colour = "993300") +
+    geom_jitter(alpha = 0.75) +
+    labs(x = "Months",
+         y = "Temperature",
+         title="Maximum temperature by month") +
+    theme_dark() + 
+    scale_x_continuous(breaks = c(5, 6, 7, 8, 9), 
+                       labels = c("May", "June", "July", "August", "September")) +
+    scale_y_sqrt() +
+    annotate("text", x = 4.08, y = 95, label="°F", size = 8) +
+    
+    coord_cartesian(xlim = c(4.5, 9.5),
+                    clip = 'off') +
+    theme(panel.grid.minor = element_blank(),
+          panel.background = element_blank(), 
+          axis.line = element_line(colour = "magenta"),
+          panel.border = element_blank(),
+          text = element_text(size=18)
+          )
+ # scale_fill_manual(values=c("#CC6666", "#9999CC", "#66CC99", "")) +
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
