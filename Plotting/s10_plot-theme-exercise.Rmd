@@ -9,6 +9,11 @@ output:
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
 library(gapminder)
+suppressPackageStartupMessages(library(here))
+library(readxl)
+library(tidyverse)
+library(readr) #this is needed in order to read in the csv file
+library(svglite)
 ```
 
 
@@ -19,9 +24,10 @@ library(gapminder)
     - Practice by saving the following plot to file: 
 
 ```{r}
-ggplot(mtcars, aes(hp, wt)) + 
+dir.create(here::here("Plotting", "output", "figures"), recursive = TRUE)
+hp_wt_graph <- ggplot(mtcars, aes(hp, wt)) + 
     geom_point()
-ggsave(FILENAME_HERE, PLOT_OBJECT_HERE)
+ggsave(here::here("Plotting", "output", "figures", "hp_wt_graph.png"), hp_wt_graph)
 ```
 
 - Base R way: print plots "to screen", sandwiched between `pdf()`/`jpeg()`/`png()`... and `dev.off()`. 
@@ -51,9 +57,10 @@ p_scales +
     scale_x_log10() +
     scale_colour_continuous(
         trans  = "log10", 
-        breaks = FILL_IN_BREAKS
+        breaks = 10^(1:10) #I took this from the next questions. It still doesn't look any different though.
+        #I couldn't get this part of it to work on my own. I haven't figured out the function that is supposed to work for it. 
     ) +
-    FILL_IN_SCALE_FUNCTION(breaks=FILL_IN_BREAKS)
+    scale_y_continuous(breaks= seq(from = 20, to = 90, by = 10))
 ```
 
 2. Specify `scales::*_format` in the `labels` argument of a scale function to do the following:
@@ -63,11 +70,11 @@ p_scales +
 ```{r}
 library(scales)
 p_scales +
-    scale_x_log10(labels=FILL_THIS_IN) +
+    scale_x_log10(labels=scales::dollar_format()) +
     scale_colour_continuous(
         trans  = "log10", 
         breaks = 10^(1:10),
-        labels = FILL_THIS_IN
+        labels = scales::comma_format() # this chanes the values in the key to be in comma formatting
     ) +
     scale_y_continuous(breaks=10*(1:10))
 ```
@@ -80,7 +87,7 @@ p_scales +
 RColorBrewer::display.brewer.all()
 p_scales +
     scale_x_log10(labels=dollar_format()) +
-    FILL_IN_WITH_RCOLORBREWER(
+    scale_fill_brewer(
         trans   = "log10",
         breaks  = 10^(1:10),
         labels  = comma_format(),
